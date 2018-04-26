@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ImageContainer"
+    android:layout_width="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/goBack_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="goBack"
+        android:text="Go Back"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/Continue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/goBack_b"
+        android:text="Continue"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/add_friends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="73dp"
+        android:text="Add Friends" />
+    <!--<EditText-->
+    <!--android:id="@+id/edit_dialog"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:singleLine="true"-->
+    <!--android:visibility="visible" />-->
+</RelativeLayout>
+
+
+
