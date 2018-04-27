@@ -1,6 +1,7 @@
 package com.ltapps.textscanner;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,13 +15,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class settingItemsActivity extends AppCompatActivity {
     private Button go_back_b, Continue, addFriends;
     private String text;
-    private Map<Item, Integer> AllItems = new HashMap<>();
+    private HashMap<Item, Integer> AllItems = new HashMap<Item, Integer>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +31,12 @@ public class settingItemsActivity extends AppCompatActivity {
         go_back_b = (Button) findViewById(R.id.goBack_b);
         addFriends = (Button) findViewById(R.id.add_friends);
         Continue = (Button) findViewById(R.id.Continue);
+        Continue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                continueToPicking();
+            }
+        });
         text = getIntent().getStringExtra("OCR_text");
         addFriends.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,4 +191,37 @@ public class settingItemsActivity extends AppCompatActivity {
             AllItems.put(new_item, amount_int);
         }
     }
+
+    private void continueToPicking()
+    {
+
+
+
+        Intent intent = new Intent(settingItemsActivity.this, PickingItemsActivity.class);
+        intent.putExtra("Items",AllItems);
+
+        // temp, need to create real list!!!
+        ArrayList<User> users=new ArrayList<User>();
+        User guy=new User("Guy",copyMap(AllItems));
+        User sap=new User("Sap",copyMap(AllItems));
+        User jina=new User("Jina",copyMap(AllItems));
+        users.add(guy);
+        users.add(sap);
+        users.add(jina);
+        //
+        intent.putExtra("Users",users);
+        settingItemsActivity.this.startActivity(intent);
+    }
+
+    private HashMap<Item, Integer> copyMap(HashMap<Item, Integer> cpMap)
+    {
+        HashMap<Item, Integer> items = new HashMap<Item, Integer>();
+        Item tempItem;
+        for (Map.Entry<Item, Integer> entry : AllItems.entrySet()) {
+            tempItem=entry.getKey();
+            items.put(tempItem,0);
+        }
+        return items;
+    }
+
 }

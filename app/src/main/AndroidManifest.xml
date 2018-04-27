@@ -21,7 +21,9 @@
         <activity android:name=".CropAndRotate" />
         <activity android:name=".Binarization" />
         <activity android:name=".Recognizer" />
-        <activity android:name=".settingItemsActivity"></activity>
+        <activity android:name=".settingItemsActivity" />
+        <activity android:name=".PickingItemsActivity" />
+        <activity android:name=".PaymentActivity"></activity>
     </application>
 
 </manifest>
