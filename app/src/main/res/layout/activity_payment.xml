@@ -26,12 +26,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="54dp"
+
             android:onClick="remainItems"
             android:text="Remain Items" />
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
             android:layout_alignParentTop="true">
             <LinearLayout
                 android:layout_width="match_parent"

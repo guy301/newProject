@@ -365,14 +365,14 @@ public class PickingItemsActivity extends AppCompatActivity {
         ArrayList<User> usersList=(ArrayList<User>)users;
         HashMap<Item,Integer> remainMap=(HashMap<Item,Integer>)AppItemsMap;
         User usr;
-        for(int i=0;i<usersList.size();i++)
-        {
-            usr=usersList.get(i);
-            if(usr instanceof  GroupUser) {
-                usersList.remove(usr);
-                i=0;
-            }
-        }
+//        for(int i=0;i<usersList.size();i++)
+//        {
+//            usr=usersList.get(i);
+//            if(usr instanceof  GroupUser) {
+//                usersList.remove(usr);
+//                i=0;
+//            }
+//        }
         intent.putExtra("Users",usersList);
         intent.putExtra("remainItems",remainMap);
         startActivity(intent);

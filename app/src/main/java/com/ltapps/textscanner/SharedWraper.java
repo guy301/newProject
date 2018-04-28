@@ -2,6 +2,7 @@ package com.ltapps.textscanner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -9,41 +10,26 @@ import java.util.List;
  */
 
 public class SharedWraper implements Serializable {
-    private double quantity;
-    private Item item;
-    private int[] gruop;
+    HashMap<Item,Double> items;
+    private int gruop;
 
-    public SharedWraper(double quantity,Item itm,int[] gruop)
+    public SharedWraper(int gruop)
     {
         this.gruop=gruop;
-        this.quantity=quantity;
-        this.item=itm;
+        this.items=new HashMap<Item,Double>();
     }
 
-    public int[] getGroup()
+    public void updateItem(Item itm,double quantity)
     {
-        return this.gruop;
+//        double oldQuantity=0;
+//        if(this.items.get(itm)!=null)
+//            oldQuantity =this.items.get(itm);
+//        this.items.put(itm,oldQuantity+quantity);
+        this.items.put(itm,quantity);
     }
-
-    public Item getItem()
+    public HashMap<Item,Double> getItems()
     {
-        return this.item;
+        return this.items;
     }
-
-    public double getQuantity()
-    {
-        return  this.quantity;
-    }
-
-    public void addToQuantity(double sum)
-    {
-        this.quantity+=sum;
-    }
-
-    public void updateQuantity(double sum)
-    {
-        this.quantity=sum;
-    }
-
 
 }

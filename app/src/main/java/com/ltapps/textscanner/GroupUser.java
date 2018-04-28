@@ -27,10 +27,10 @@ public class GroupUser  extends User{
         double sum=((double)itm.getPrice()*(amount-val))/this.size;
         for(int i=0;i<this.size;i++)
         {
-            ;
+
             user=findUserById(members[i],users);
-            user.addToShared(this.members,itm ,((double)amount)/size);
-         //   user.addToTotalPayment(sum);
+            user.addToShared(this.getId(),itm ,((double)amount)/size);
+           user.addToTotalPayment(sum);
         }
         this.items.put(itm,amount);
 

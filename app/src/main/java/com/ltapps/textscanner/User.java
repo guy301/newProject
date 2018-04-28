@@ -21,7 +21,7 @@ public class User implements Serializable {
     protected double totalPayment;
     protected HashMap<Item,Integer> items;
     private HashMap<Integer,SharedWraper> sharedItems;
-    private  List<Integer> shareGrups;
+  //  private  List<Integer> shareGrups;
 
     public User()
     {
@@ -31,7 +31,7 @@ public class User implements Serializable {
         this.totalPayment=0;
         this.items=new HashMap<Item,Integer>();
         this.sharedItems=new HashMap<Integer,SharedWraper>();
-        this.shareGrups = new ArrayList<Integer>();
+       // this.shareGrups = new ArrayList<Integer>();
     }
 
     public User(String name,HashMap<Item,Integer> items)
@@ -42,7 +42,7 @@ public class User implements Serializable {
         this.id=numOfUsers;
         this.totalPayment=0;
         this.sharedItems=new HashMap<Integer,SharedWraper>();
-        this.shareGrups = new ArrayList<Integer>();
+       // this.shareGrups = new ArrayList<Integer>();
 
     }
 
@@ -60,55 +60,45 @@ public class User implements Serializable {
     }
 
 
-    public void addToShared(int[] gruop,Item itm ,double quantity)
+    public void addToShared(int GroupUserId,Item itm ,double quantity)
     {
-        int id=isExistingGroupAndItemShared(gruop,itm);
-        if(id==-1)
-        {
-            SharedWraper tmpShared=new SharedWraper(quantity,itm,gruop);
-            id=sharedItems.size();
-           sharedItems.put(id,tmpShared);
-        }
-        else
-        {
-            SharedWraper tmpShared=sharedItems.get(id);
-            tmpShared.addToQuantity(quantity);
-        }
-        this.totalPayment+=quantity*itm.getPrice();
-
+        SharedWraper wrap=isExistingGroup(GroupUserId);
+       // double price=itm.getPrice();
+       // this.totalPayment+=quantity*price;
+        wrap.updateItem(itm,quantity);
     }
-
-    private int isExistingGroupAndItemShared(int[] gruop,Item itm)
-    {
-        int i=0;
-        int id;
-        SharedWraper sharedWraper;
-        Item tmpItm;
-        int[] tmpGroup;
-        Arrays.sort(gruop);
-        boolean flag=true;
-        for (Map.Entry<Integer,SharedWraper> entry : sharedItems.entrySet())
-        {
-            flag=true;
-            id=entry.getKey();
-            sharedWraper=entry.getValue();
-            tmpItm=sharedWraper.getItem();
-            tmpGroup=sharedWraper.getGroup();
-            if(gruop.length!=tmpGroup.length)
-                continue;
-            if(!(itm.equals(tmpItm)))
-                continue;
-            Arrays.sort(tmpGroup);
-            for(int j=0;j<tmpGroup.length;j++)
-            {
-                if(tmpGroup[j]!=gruop[j])
-                    flag=false;
-            }
-            if(flag==true)
-                return id;
-        }
-        return -1;
-    }
+//
+//    private int isExistingGroupAndItemShared(int[] gruop,Item itm)
+//    {
+//        int i=0;
+//        int id;
+//        SharedWraper sharedWraper;
+//        Item tmpItm;
+//        int[] tmpGroup;
+//        Arrays.sort(gruop);
+//        boolean flag=true;
+//        for (Map.Entry<Integer,SharedWraper> entry : sharedItems.entrySet())
+//        {
+//            flag=true;
+//            id=entry.getKey();
+//            sharedWraper=entry.getValue();
+//            tmpItm=sharedWraper.getItem();
+//            tmpGroup=sharedWraper.getGroup();
+//            if(gruop.length!=tmpGroup.length)
+//                continue;
+//            if(!(itm.equals(tmpItm)))
+//                continue;
+//            Arrays.sort(tmpGroup);
+//            for(int j=0;j<tmpGroup.length;j++)
+//            {
+//                if(tmpGroup[j]!=gruop[j])
+//                    flag=false;
+//            }
+//            if(flag==true)
+//                return id;
+//        }
+//        return -1;
+//    }
     public List<Item> getItemsList()
     {
         List<Item> itemsList = new ArrayList<Item>();
@@ -162,7 +152,8 @@ public class User implements Serializable {
 
     public void addToshareGrups(int newGroupUser)
     {
-        this.shareGrups.add(newGroupUser);
+        SharedWraper wrap=new SharedWraper(newGroupUser);
+        this.sharedItems.put(newGroupUser,wrap);
     }
 
     public GroupUser inTheGruop(List<User> usersList,int[] gruop)
@@ -171,13 +162,25 @@ public class User implements Serializable {
         User usr;
         GroupUser gUser;
         int id;
-        for(int i=0 ; i < this.shareGrups.size() ;i++) {
-            id=this.shareGrups.get(i);
+
+        for (Map.Entry<Integer,SharedWraper> entry : sharedItems.entrySet()) {
+            id=entry.getKey();
             gUser=(GroupUser)findUserById(id, usersList);
             if(gUser.isMyGroup(gruop))
                 return  gUser;
         }
         return null;
+    }
+
+    private SharedWraper isExistingGroup(int groupUser)
+    {
+        SharedWraper wrap=this.sharedItems.get(groupUser);
+        if(wrap==null)
+        {
+            wrap=new SharedWraper(groupUser);
+            this.sharedItems.put(groupUser,wrap);
+        }
+        return wrap;
     }
 
     protected User findUserById(int id,List<User> users)

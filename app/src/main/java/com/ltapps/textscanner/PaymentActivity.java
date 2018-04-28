@@ -18,6 +18,8 @@ package com.ltapps.textscanner;
         import org.w3c.dom.Text;
 
         import java.text.DecimalFormat;
+        import java.text.NumberFormat;
+        import java.text.ParsePosition;
         import java.util.ArrayList;
         import java.util.HashMap;
         import java.util.List;
@@ -53,6 +55,8 @@ public class PaymentActivity extends AppCompatActivity {
         int j=0;
         for (int i=0;i<users.size();i++) {
             usr=users.get(i);
+            if(usr instanceof GroupUser)
+                continue;
             name=usr.getName();
             payment=usr.getTotalPayment()*tip;
             Button btn = new Button(this);
@@ -67,7 +71,6 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void updateUsers()
     {
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.payment);
         String name;
         User usr;
         double payment;
@@ -83,25 +86,26 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
 
-    public void setTip(View view)
+    public void setTip(final View view)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Eter tip percentage");
         // Set up the input
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_NUMBER );
+        input.setInputType(InputType.TYPE_CLASS_PHONE);
         builder.setView(input);
         builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String s=input.getText().toString();
                 int tmp=0;
-                if(s!=null && s!="")
-                    tmp=Integer.parseInt(s);
-                tip=1+(double)tmp/100;
-                updateUsers();
-                dialog.cancel();
+                if(s!=null && s!="" && !s.isEmpty() && isNumeric(s) ) {
+                    tmp = Integer.parseInt(s);
+                    tip = 1 + (double) tmp / 100;
+                    updateUsers();
+                    dialog.cancel();
+                }
             }
         });
         final  AlertDialog a = builder.create();
@@ -186,57 +190,59 @@ public class PaymentActivity extends AppCompatActivity {
     private String getUserSharedItems(User usr)
     {
         String str=null;
-        HashMap<Integer,SharedWraper>  items=usr.getSharedItems();
+        HashMap<Integer,SharedWraper>  UserSharedWrap=usr.getSharedItems();
         double quantity;
         String name;
         double price;
         String tmp;
         SharedWraper sharedWraper;
+        HashMap<Item,Double> items;
         Item itm;
         int[] group;
+        int gUserId;
+        GroupUser gUser;
         User friendUser;
-        for (Map.Entry<Integer,SharedWraper> entry : items.entrySet()) {
+        for (Map.Entry<Integer,SharedWraper> entry : UserSharedWrap.entrySet()) {
             sharedWraper=entry.getValue();
-            quantity = sharedWraper.getQuantity();
+            items=sharedWraper.getItems();
+            for(Map.Entry<Item,Double> entry1:items.entrySet() ) {
+                quantity = entry1.getValue();
 
-            if(quantity!=0)
-            {
-                group=sharedWraper.getGroup();
-                itm=sharedWraper.getItem();
-                price=itm.getPrice();
-                name=itm.getName();
-                tmp=new DecimalFormat("##.##").format(price);
-                tmp+=name;
-                if(str==null)
-                {
-                    str="   "+name+" x "+new DecimalFormat("##.##").format(quantity)+"   ";
-                    str+=price+"$"+"     shared with: ";
-                    for(int i=0;i<group.length;i++)
-                    {
-                        friendUser=findUserById(group[i]);
-                        if(friendUser.getName()==usr.getName())
-                            continue;
-                        str+=friendUser.getName();
-                        if(i!=(group.length-1))
-                            str+=",";
+                if (quantity != 0) {
+                    gUserId=entry.getKey();
+                    gUser=(GroupUser)findUserById(gUserId);
+                    group = gUser.getMembers();
+                    itm = entry1.getKey();
+                    price = itm.getPrice();
+                    name = itm.getName();
+                    tmp = new DecimalFormat("##.##").format(price);
+                    tmp += name;
+                    if (str == null) {
+                        str = "   " + name + " x " + new DecimalFormat("##.##").format(quantity) + "   ";
+                        str += price + "$" + "     shared with: ";
+                        for (int i = 0; i < group.length; i++) {
+                            friendUser = findUserById(group[i]);
+                            if (friendUser.getName() == usr.getName())
+                                continue;
+                            str += friendUser.getName();
+                            if (i != (group.length - 1))
+                                str += ",";
+                        }
+                    } else {
+                        str += "   " + name + " x " + new DecimalFormat("##.##").format(quantity) + "   ";
+                        str += price + "$" + " shared with: ";
+                        for (int i = 0; i < group.length; i++) {
+                            friendUser = findUserById(group[i]);
+                            if (friendUser.getName() == usr.getName())
+                                continue;
+                            str += friendUser.getName() + ", ";
+                            if (i != (group.length - 1))
+                                str += ",";
+                        }
                     }
-                }
-                else
-                {
-                    str+="   "+name+" x "+new DecimalFormat("##.##").format(quantity)+"   ";
-                    str+=price+"$"+" shared with: ";
-                    for(int i=0;i<group.length;i++)
-                    {
-                        friendUser=findUserById(group[i]);
-                        if(friendUser.getName()==usr.getName())
-                            continue;
-                        str+=friendUser.getName()+", ";
-                        if(i!=(group.length-1))
-                            str+=",";
-                    }
-                }
-                str+="\n";
+                    str += "\n";
 
+                }
             }
         }
         return str;
@@ -327,6 +333,14 @@ public class PaymentActivity extends AppCompatActivity {
             }
         }
         return str;
+    }
+
+    public static boolean isNumeric(String str)
+    {
+        NumberFormat formatter = NumberFormat.getInstance();
+        ParsePosition pos = new ParsePosition(0);
+        formatter.parse(str, pos);
+        return str.length() == pos.getIndex();
     }
 }
 

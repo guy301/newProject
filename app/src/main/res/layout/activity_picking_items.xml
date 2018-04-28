@@ -24,6 +24,7 @@
                 android:layout_height="50dp"
                 android:text="Payment"
                 android:onClick="goToPayment"/>
+
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,9 +34,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_alignParentLeft="true"
                 android:id="@+id/users">
             </LinearLayout>
-         </RelativeLayout>
+        </RelativeLayout>
 
     </RelativeLayout>
 
