@@ -24,6 +24,7 @@ public class settingItemsActivity extends AppCompatActivity {
     private Button go_back_b, Continue, addFriends;
     private String text;
     private HashMap<Item, Integer> AllItems = new HashMap<Item, Integer>();
+    private ArrayList<User> AllUsers = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,12 +105,14 @@ public class settingItemsActivity extends AppCompatActivity {
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.ImageContainer);
         int i=0;
         for (String name : words){
+            User curr_user = new User(name, copyMap(AllItems));
+            AllUsers.add(curr_user);
             final Button yourButton = new Button(this);
             yourButton.setText(name);
             yourButton.setLayoutParams(new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
-            yourButton.setX(-700);
+            yourButton.setX(-400);
             yourButton.setY(300+i*150);
             i++;
             layout.addView(yourButton );
@@ -147,7 +150,7 @@ public class settingItemsActivity extends AppCompatActivity {
         }
     }
 
-    private void showDialog(String str, final Button btn) {
+    private void showDialog(final String str, final Button btn) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("input text");
@@ -161,9 +164,24 @@ public class settingItemsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 btn.setText(edit.getText().toString());
+                updateItem(str, edit.getText().toString());
             }
         });
         builder.show();
+    }
+/**updating an item in the AllItems map in case the user changed it's details*/
+    public void updateItem(String old_details, String new_details){
+        final String[] details = old_details.split("\\s+");
+        final String[] new_det = new_details.split("\\s+");
+        for (Map.Entry<Item, Integer> entry : AllItems.entrySet()){
+            if (entry.getKey().getName().equals(details[0])){
+                int new_price = (int)Double.parseDouble(new_det[1]);
+                Item updated = new Item(new_det[0], new_price);
+                AllItems.remove(entry.getKey());
+                AllItems.put(updated, Integer.parseInt(new_det[2]));
+                return;
+            }
+        }
     }
 
     public void processText(String s){
@@ -194,22 +212,19 @@ public class settingItemsActivity extends AppCompatActivity {
 
     private void continueToPicking()
     {
-
-
-
         Intent intent = new Intent(settingItemsActivity.this, PickingItemsActivity.class);
         intent.putExtra("Items",AllItems);
 
         // temp, need to create real list!!!
-        ArrayList<User> users=new ArrayList<User>();
-        User guy=new User("Guy",copyMap(AllItems));
-        User sap=new User("Sap",copyMap(AllItems));
-        User jina=new User("Jina",copyMap(AllItems));
-        users.add(guy);
-        users.add(sap);
-        users.add(jina);
+//        ArrayList<User> users=new ArrayList<User>();
+//        User guy=new User("Guy",copyMap(AllItems));
+//        User sap=new User("Sap",copyMap(AllItems));
+//        User jina=new User("Jina",copyMap(AllItems));
+//        users.add(guy);
+//        users.add(sap);
+//        users.add(jina);
         //
-        intent.putExtra("Users",users);
+        intent.putExtra("Users", AllUsers);
         settingItemsActivity.this.startActivity(intent);
     }
 

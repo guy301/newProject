@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\Guy\Desktop\text-scanner-master\TextScanner.iml" filepath="C:\Users\Guy\Desktop\text-scanner-master\TextScanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/text-scanner-master.iml" filepath="$PROJECT_DIR$/text-scanner-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/newProject.iml" filepath="$PROJECT_DIR$/newProject.iml" />
     </modules>
   </component>
 </project>
