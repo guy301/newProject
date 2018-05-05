@@ -21,19 +21,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:layout_below="@+id/toolbar"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/search_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:hint="Search"
-            android:textColorHint="@color/colorTitle"
-            android:textSize="18sp"
-            android:textColor="@color/colorTitle"
-            />
-    </LinearLayout>
+        android:orientation="horizontal"></LinearLayout>
 
     <TextView
         android:id="@+id/textExtracted"

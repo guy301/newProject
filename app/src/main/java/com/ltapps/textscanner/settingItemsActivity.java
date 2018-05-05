@@ -1,7 +1,9 @@
 package com.ltapps.textscanner;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 
@@ -24,6 +27,7 @@ public class settingItemsActivity extends AppCompatActivity {
     private Button go_back_b, Continue, addFriends;
     private String text;
     private HashMap<Item, Integer> AllItems = new HashMap<Item, Integer>();
+    private ArrayList<User> AllUsers = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,18 +105,14 @@ public class settingItemsActivity extends AppCompatActivity {
         if (s.isEmpty())
             return;
         final String[] words = s.split("\\s+");
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.ImageContainer);
         int i=0;
         for (String name : words){
+            User curr_user = new User(name, copyMap(AllItems));
+            AllUsers.add(curr_user);
             final Button yourButton = new Button(this);
             yourButton.setText(name);
-            yourButton.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-            yourButton.setX(-700);
-            yourButton.setY(300+i*150);
-            i++;
-            layout.addView(yourButton );
+            LinearLayout lm = (LinearLayout) findViewById(R.id.items);
+            lm.addView(yourButton );
         }
     }
 
@@ -123,7 +123,6 @@ public class settingItemsActivity extends AppCompatActivity {
         if (AllItems.isEmpty()) {
             return;
         }
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.ImageContainer);
         int i=0;
         for (Map.Entry<Item, Integer> entry : AllItems.entrySet()){
             final String b_text = entry.getKey().getName() + "\n" + entry.getKey().getPrice() + "\n"
@@ -133,9 +132,8 @@ public class settingItemsActivity extends AppCompatActivity {
             yourButton.setLayoutParams(new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
-            yourButton.setY(300+i*150);
-            i++;
-            layout.addView(yourButton );
+            LinearLayout lm = (LinearLayout) findViewById(R.id.users);
+            lm.addView(yourButton );
             yourButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -147,12 +145,10 @@ public class settingItemsActivity extends AppCompatActivity {
         }
     }
 
-    private void showDialog(String str, final Button btn) {
+    private void showDialog(final String str, final Button btn) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("input text");
-        //final View view = LayoutInflater.from(this).inflate(R.layout.activity_setting_items, null);
-        //final EditText edit_dialog = findViewById(R.id.edit_dialog);
         final EditText edit = new EditText(this);
         edit.setText(str);
         builder.setView(edit);
@@ -161,55 +157,85 @@ public class settingItemsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 btn.setText(edit.getText().toString());
+                updateItem(str, edit.getText().toString());
             }
         });
         builder.show();
     }
+    /**updating an item in the AllItems map in case the user changed it's details*/
+    public void updateItem(String old_details, String new_details){
+        final String[] details = old_details.split("\\s+");
+        final String[] new_det = new_details.split("\\s+");
+        for (Map.Entry<Item, Integer> entry : AllItems.entrySet()){
+            if (entry.getKey().getName().equals(details[0])){
+                int new_price = (int)Double.parseDouble(new_det[1]);
+                Item updated = new Item(new_det[0], new_price);
+                AllItems.remove(entry.getKey());
+                AllItems.put(updated, Integer.parseInt(new_det[2]));
+                return;
+            }
+        }
+    }
 
     public void processText(String s){
-        final String[] words = s.split("\\s+");
-        int j=0;//j=4 so we pass the titles, assuming there are 4 titles
-        int words_num = words.length;
-        //while (j < words_num-1-4) {//(-4) to ignore the total line assuming there are 4 columns
-        int length=words.length;
-        for (j=0;j<length-3;) {
-//            final String item = "food" + j;
-//            final String amount_s = "1";
-//            final int amount_int = Integer.parseInt(amount_s);
-//            final int price_int = j++;
+        final String[] lines = s.split("\\n");
+        String name = "";
+        int amount_double = 0;
+        double price_double = 0.0;
+        /**3 col version: quantity-name-price*/
+        int col_count = 0;
+        int lines_num = lines.length;
+        for (String line : lines) {
+            String[] words = line.split("\\s");
+            int words_num = words.length;
+            for (String word : words){
+                if(col_count == 0) {
+                    if (!isNumeric(word)) {//OCR wrong, should be quantity
+                        popError();
+                        break;
+                    }
+                    amount_double = Integer.parseInt(word);
+                    col_count++;
+                    words_num--;
+                    continue;
+                }
+                if (!isNumeric(word)){
+                    if (words_num == 1) { //there is no price col
+                        popError();
+                        break;
+                    }
+                    name = name + word + " ";
+                    words_num--;
+                    continue;
+                }
+                else // got to the price col
+                    price_double = Double.parseDouble(word);
 
-
-            final String item = words[j++];
-            final String amount_s = words[j++];
-            final int amount_int = Integer.parseInt(amount_s);
-            final String price_s = words[j++];
-            final int price_int = Integer.parseInt(price_s);
-            final String total_s = words[j++];
-            final int total_int = Integer.parseInt(total_s);
-            Item new_item = new Item(item, price_int);
-
-            AllItems.put(new_item, amount_int);
+            }
+            Item new_item = new Item(name, price_double);
+            AllItems.put(new_item, amount_double);
+            col_count = 0;
+            name = "";
+            amount_double = 0;
+            price_double = 0;
         }
+    }
+
+    private void popError() {
+        Dialog error = new Dialog(this);
+        error.setContentView(R.layout.activity_setting_items);
+        TextView msg = new TextView(this);
+        msg.setTextSize(30);
+        msg.setText("       Invalid Bill\nTake a new picture");
+        error.setContentView(msg);
+        error.show();
     }
 
     private void continueToPicking()
     {
-
-
-
         Intent intent = new Intent(settingItemsActivity.this, PickingItemsActivity.class);
         intent.putExtra("Items",AllItems);
-
-        // temp, need to create real list!!!
-        ArrayList<User> users=new ArrayList<User>();
-        User guy=new User("Guy",copyMap(AllItems));
-        User sap=new User("Sap",copyMap(AllItems));
-        User jina=new User("Jina",copyMap(AllItems));
-        users.add(guy);
-        users.add(sap);
-        users.add(jina);
-        //
-        intent.putExtra("Users",users);
+        intent.putExtra("Users", AllUsers);
         settingItemsActivity.this.startActivity(intent);
     }
 
@@ -222,6 +248,19 @@ public class settingItemsActivity extends AppCompatActivity {
             items.put(tempItem,0);
         }
         return items;
+    }
+
+    public static boolean isNumeric(String str)
+    {
+        try
+        {
+            double d = Double.parseDouble(str);
+        }
+        catch(NumberFormatException nfe)
+        {
+            return false;
+        }
+        return true;
     }
 
 }

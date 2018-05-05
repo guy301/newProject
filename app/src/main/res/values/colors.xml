@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#e53935</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorPrimary">#1AC9EE</color>
+    <color name="colorPrimaryDark">#1AB2D2</color>
     <color name="colorAccent">#FFC107</color>
     <color name="colorTitle">#FFFFFF</color>
+    <color name="itemQuantity">#C5C2C2</color>
+    <color name="plusminus">#B0B0B0</color>
+    <color name="transparency">#80000000</color>
 </resources>

@@ -1,23 +1,27 @@
 package com.ltapps.textscanner;
 
+        import android.content.DialogInterface;
         import android.content.Intent;
+        import android.support.v4.view.ViewCompat;
+        import android.support.v7.app.AlertDialog;
         import android.support.v7.app.AppCompatActivity;
         import android.os.Bundle;
-        import android.text.Layout;
-        import android.view.Gravity;
+        import android.support.v7.widget.Toolbar;
+        import android.view.Menu;
         import android.view.View;
         import android.view.ViewGroup;
+        import android.widget.AdapterView;
         import android.widget.Button;
         import android.widget.CheckBox;
         import android.widget.LinearLayout;
-        import android.widget.RelativeLayout;
+        import android.widget.ListView;
+        import android.widget.TextView;
 
         import java.util.ArrayList;
         import java.util.HashMap;
         import java.util.Iterator;
         import java.util.List;
         import java.util.Map;
-        import java.util.Scanner;
 
 public class PickingItemsActivity extends AppCompatActivity {
 
@@ -26,69 +30,127 @@ public class PickingItemsActivity extends AppCompatActivity {
     private  List<User> users;
     private  Map<Item,Integer> AppItemsMap;
     private  Map<Button,Item> buttonsList;
+    private List<Item> itemsOrder=new ArrayList<Item>();
     private   int maxButtonWidth=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picking_items);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ViewCompat.setElevation(toolbar,10);
         buttonsList=new HashMap<Button,Item>();
         users = (ArrayList<User>) getIntent().getSerializableExtra("Users");
         AppItemsMap= (Map<Item,Integer>) getIntent().getSerializableExtra("Items");
         List<CheckBox> usersButtonList=addUserButtons(users);
+        setItemsOrder();
         addItemsButtons(AppItemsMap, null);
     }
 
-
+    private void setItemsOrder()
+    {
+        for (Map.Entry<Item, Integer> entry : AppItemsMap.entrySet()) {
+            this.itemsOrder.add(entry.getKey());
+        }
+    }
 
     public void addItemsButtons(Map<Item,Integer> itemsMap,User user)
     {
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.pickItem);
-        Item itm;
         int quantity;
-        String name;
+        List<Item> itemsList=new ArrayList<Item>();
+        int quantityList[] =new int[itemsMap.size()];
         int i=0;
-        for (Map.Entry<Item, Integer> entry : itemsMap.entrySet()) {
-            itm = entry.getKey();
-            quantity = entry.getValue();
-            name = itm.getName();
-            Button btn = new Button(this);
-            btn.setText(name + ": " + quantity);
-            layout.addView(btn);
-            btn.setY(i * 170);
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) btn.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            if(btn.getWidth()>maxButtonWidth)
-                maxButtonWidth=btn.getWidth();
-            buttonsList.put(btn,itm);
-            if (activeUser != null)
-                itemButtonsOnclik(btn,user);
+        for(Item itm:this.itemsOrder)
+        {
+            quantity=itemsMap.get(itm);
+            itemsList.add(itm);
+            quantityList[i]=quantity;
             i++;
         }
+        ListView simpleList = (ListView) findViewById(R.id.items);
+        CustomAdapter customAdapter = new CustomAdapter(getApplicationContext(), itemsList, quantityList,this);
+        simpleList.setAdapter(customAdapter);
     }
 
+
+
+//    public void addItemsButtons(Map<Item,Integer> itemsMap,User user)
+//    {
+//        ListView layout = (ListView) findViewById(R.id.items);
+//        Item itm;
+//        int quantity;
+//        String name;
+//        int i=0;
+//        //
+//        ArrayList<RelativeLayout> listItems=new ArrayList<RelativeLayout>();
+//        ArrayAdapter<RelativeLayout> adapter=new ArrayAdapter<RelativeLayout>(this,
+//                android.R.layout.simple_list_item_1,  listItems);
+//        layout.setAdapter(adapter);
+//        //
+//
+//
+//        for (Map.Entry<Item, Integer> entry : itemsMap.entrySet()) {
+//
+//            itm = entry.getKey();
+//            quantity = entry.getValue();
+//            name = itm.getName();
+//            Button btn = new Button(this);
+//            btn.setText(name + ": " + quantity);
+//            buttonsList.put(btn,itm);
+//            listItems.add(itm.getName());
+//            adapter.notifyDataSetChanged();
+//            if (activeUser != null)
+//                itemButtonsOnclik(btn,user);
+//            i++;
+//        }
+//    }
+//
+//    private void uptadeItemsButtons(User user)
+//    {
+//        LinearLayout layout = (ListView) findViewById(R.id.items);
+//        Button btn;
+//        Item itm;
+//        String name;
+//        int quantity;
+//        Map<Item,Integer> userItemsMap;
+//        if(user!=null)
+//            userItemsMap=user.getItems();
+//        else
+//            userItemsMap= AppItemsMap;
+//        for (Map.Entry<Button, Item> entry : buttonsList.entrySet()) {
+//            btn=entry.getKey();
+//            itm=entry.getValue();
+//            name=itm.getName();
+//            quantity=userItemsMap.get(itm);
+//            btn.setText(name + ": " + quantity);
+//            // btn.setWidth(maxButtonWidth);
+//            if (activeUser != null)
+//                itemButtonsOnclik(btn,user);
+//        }
+//    }
+
+    public AlertDialog getDialog(double price)
+    {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setMessage("Price:  "+price+"$");
+        return alertDialog;
+    }
+
+    public User getActiveUser()
+    {
+        return  this.activeUser;
+    }
+
+    public Map<Item,Integer> getAppItemsMap()
+    {
+        return this.AppItemsMap;
+    }
     private void uptadeItemsButtons(User user)
     {
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.pickItem);
-        Button btn;
-        Item itm;
-        String name;
-        int quantity;
-        Map<Item,Integer> userItemsMap;
-        if(user!=null)
-            userItemsMap=user.getItems();
-        else
-            userItemsMap= AppItemsMap;
-        for (Map.Entry<Button, Item> entry : buttonsList.entrySet()) {
-            btn=entry.getKey();
-            itm=entry.getValue();
-            name=itm.getName();
-            quantity=userItemsMap.get(itm);
-            btn.setText(name + ": " + quantity);
-            // btn.setWidth(maxButtonWidth);
-            if (activeUser != null)
-                itemButtonsOnclik(btn,user);
-        }
+
     }
+
 
     public void itemButtonsOnclik(final Button btn,final User user)
     {
@@ -219,13 +281,15 @@ public class PickingItemsActivity extends AppCompatActivity {
                     break;
                 }
             }
+
         }
-        if(activeUser==null)
-            addItemsButtons(AppItemsMap,null);
+        ListView simpleList = (ListView) findViewById(R.id.items);
+        simpleList.invalidateViews();
+        if(activeUser!=null)
+            addItemsButtons(activeUser.getItems(),activeUser);
         else
-        {
-            uptadeItemsButtons(activeUser);
-        }
+            addItemsButtons(AppItemsMap, null);
+
     }
 
     private GroupUser createNewGruopUser(User user, int[] group)
@@ -376,6 +440,13 @@ public class PickingItemsActivity extends AppCompatActivity {
         intent.putExtra("Users",usersList);
         intent.putExtra("remainItems",remainMap);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_picking_items, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }
 

@@ -58,7 +58,6 @@ public class Recognizer extends AppCompatActivity implements  Toolbar.OnMenuItem
         ViewCompat.setElevation((LinearLayout) findViewById(R.id.extension),10);
         textView = (TextView) findViewById(R.id.textExtracted);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        search = (EditText) findViewById(R.id.search_text);
         // Setting progress dialog for copy job.
         progressCopy = new ProgressDialog(Recognizer.this);
         progressCopy.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -75,34 +74,6 @@ public class Recognizer extends AppCompatActivity implements  Toolbar.OnMenuItem
         progressOcr.setMessage("Extracting text, please wait");
         textScanned = "";
 
-        search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String ett = search.getText().toString().replaceAll("\n"," ");
-                String tvt = textView.getText().toString().replaceAll("\n"," ");
-                textView.setText(textView.getText().toString());
-                if(!ett.toString().isEmpty()) {
-                    int ofe = tvt.toLowerCase().indexOf(ett.toLowerCase(), 0);
-                    Spannable WordtoSpan = new SpannableString(textView.getText());
-                    for (int ofs = 0; ofs < tvt.length() && ofe != -1; ofs = ofe + 1) {
-                        ofe = tvt.toLowerCase().indexOf(ett.toLowerCase(), ofs);
-                        if (ofe == -1)
-                            break;
-                        else {
-                            WordtoSpan.setSpan(new BackgroundColorSpan(ContextCompat.getColor(Recognizer.this, R.color.colorAccent)), ofe, ofe + ett.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            textView.setText(WordtoSpan, TextView.BufferType.SPANNABLE);
-                        }
-
-                    }
-                }
-            }
-        });
 
         copy.execute();
         ocr.execute();
@@ -111,12 +82,7 @@ public class Recognizer extends AppCompatActivity implements  Toolbar.OnMenuItem
     }
 
     private void recognizeText(){
-        String language = "";
-        if (Binarization.language == 0)
-            language = "eng";
-        else
-            language= "spa";
-
+        String language = "eng";
         baseApi = new TessBaseAPI();
         baseApi.init(DATA_PATH, language,TessBaseAPI.OEM_TESSERACT_ONLY);
         baseApi.setImage(Binarization.umbralization);
