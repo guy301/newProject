@@ -83,6 +83,11 @@ public class Recognizer extends AppCompatActivity implements  Toolbar.OnMenuItem
 
     private void recognizeText(){
         String language = "eng";
+        if (Binarization.language == 0)
+            language = "eng";
+        else
+            language= "heb";
+
         baseApi = new TessBaseAPI();
         baseApi.init(DATA_PATH, language,TessBaseAPI.OEM_TESSERACT_ONLY);
         baseApi.setImage(Binarization.umbralization);

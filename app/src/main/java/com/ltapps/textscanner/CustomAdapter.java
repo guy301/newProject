@@ -72,7 +72,7 @@ public class CustomAdapter extends BaseAdapter {
         minus.setTag(itemQuantityLayout);
         setOnClickPlus(plus,itm);
         setOnClickMinus(minus,itm);
-        itemNameLayout.setGravity(Gravity.LEFT);
+       // itemNameLayout.setGravity(Gravit);
         AlertDialog dialog=p.getDialog(itm.getPrice());
         setOnClickItems(itemNameLayout,itm,dialog);
 
@@ -120,7 +120,7 @@ public class CustomAdapter extends BaseAdapter {
                         itemQuantityLayout.setText(String.valueOf(userQuantity));
                         appMap.put(itm,mapItempQuantity+1);
 
-                        activeUser.updateItem(itm,userQuantity-1);
+                        activeUser.updateItem(itm,userQuantity);
                     }
                 }
             }

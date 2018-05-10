@@ -1,6 +1,5 @@
 package com.ltapps.textscanner;
 
-        import android.content.DialogInterface;
         import android.content.Intent;
         import android.support.v4.view.ViewCompat;
         import android.support.v7.app.AlertDialog;
@@ -8,14 +7,13 @@ package com.ltapps.textscanner;
         import android.os.Bundle;
         import android.support.v7.widget.Toolbar;
         import android.view.Menu;
+        import android.view.MenuItem;
         import android.view.View;
         import android.view.ViewGroup;
-        import android.widget.AdapterView;
         import android.widget.Button;
         import android.widget.CheckBox;
         import android.widget.LinearLayout;
         import android.widget.ListView;
-        import android.widget.TextView;
 
         import java.util.ArrayList;
         import java.util.HashMap;
@@ -23,8 +21,8 @@ package com.ltapps.textscanner;
         import java.util.List;
         import java.util.Map;
 
-public class PickingItemsActivity extends AppCompatActivity {
-
+public class PickingItemsActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
+    private Toolbar toolbar;
     private User activeUser=null;
     private  boolean groupUserActive=false;
     private  List<User> users;
@@ -37,9 +35,10 @@ public class PickingItemsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picking_items);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ViewCompat.setElevation(toolbar,10);
+        toolbar.setOnMenuItemClickListener(this);
         buttonsList=new HashMap<Button,Item>();
         users = (ArrayList<User>) getIntent().getSerializableExtra("Users");
         AppItemsMap= (Map<Item,Integer>) getIntent().getSerializableExtra("Items");
@@ -74,61 +73,6 @@ public class PickingItemsActivity extends AppCompatActivity {
     }
 
 
-
-//    public void addItemsButtons(Map<Item,Integer> itemsMap,User user)
-//    {
-//        ListView layout = (ListView) findViewById(R.id.items);
-//        Item itm;
-//        int quantity;
-//        String name;
-//        int i=0;
-//        //
-//        ArrayList<RelativeLayout> listItems=new ArrayList<RelativeLayout>();
-//        ArrayAdapter<RelativeLayout> adapter=new ArrayAdapter<RelativeLayout>(this,
-//                android.R.layout.simple_list_item_1,  listItems);
-//        layout.setAdapter(adapter);
-//        //
-//
-//
-//        for (Map.Entry<Item, Integer> entry : itemsMap.entrySet()) {
-//
-//            itm = entry.getKey();
-//            quantity = entry.getValue();
-//            name = itm.getName();
-//            Button btn = new Button(this);
-//            btn.setText(name + ": " + quantity);
-//            buttonsList.put(btn,itm);
-//            listItems.add(itm.getName());
-//            adapter.notifyDataSetChanged();
-//            if (activeUser != null)
-//                itemButtonsOnclik(btn,user);
-//            i++;
-//        }
-//    }
-//
-//    private void uptadeItemsButtons(User user)
-//    {
-//        LinearLayout layout = (ListView) findViewById(R.id.items);
-//        Button btn;
-//        Item itm;
-//        String name;
-//        int quantity;
-//        Map<Item,Integer> userItemsMap;
-//        if(user!=null)
-//            userItemsMap=user.getItems();
-//        else
-//            userItemsMap= AppItemsMap;
-//        for (Map.Entry<Button, Item> entry : buttonsList.entrySet()) {
-//            btn=entry.getKey();
-//            itm=entry.getValue();
-//            name=itm.getName();
-//            quantity=userItemsMap.get(itm);
-//            btn.setText(name + ": " + quantity);
-//            // btn.setWidth(maxButtonWidth);
-//            if (activeUser != null)
-//                itemButtonsOnclik(btn,user);
-//        }
-//    }
 
     public AlertDialog getDialog(double price)
     {
@@ -425,20 +369,23 @@ public class PickingItemsActivity extends AppCompatActivity {
 
     public void goToPayment(View view)
     {
-        Intent intent = new Intent(PickingItemsActivity.this, PaymentActivity.class);
+        Intent intent = new Intent(PickingItemsActivity.this, PaymentActivity2.class);
+
         ArrayList<User> usersList=(ArrayList<User>)users;
         HashMap<Item,Integer> remainMap=(HashMap<Item,Integer>)AppItemsMap;
         User usr;
-//        for(int i=0;i<usersList.size();i++)
-//        {
-//            usr=usersList.get(i);
-//            if(usr instanceof  GroupUser) {
-//                usersList.remove(usr);
-//                i=0;
-//            }
-//        }
+        for(int i=0;i<usersList.size();i++)
+        {
+            usr=usersList.get(i);
+            if(usr instanceof  GroupUser) {
+                usersList.remove(usr);
+                i=0;
+            }
+        }
         intent.putExtra("Users",usersList);
         intent.putExtra("remainItems",remainMap);
+
+
         startActivity(intent);
     }
 
@@ -448,6 +395,17 @@ public class PickingItemsActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_picking_items, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId()==R.id.question_mark) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setMessage("tmp text");
+            alertDialog.show();
+        }
+        return false;
+    }
+
+
 }
 
 

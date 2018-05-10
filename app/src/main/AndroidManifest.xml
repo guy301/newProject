@@ -23,7 +23,11 @@
         <activity android:name=".Recognizer" />
         <activity android:name=".settingItemsActivity" />
         <activity android:name=".PickingItemsActivity" />
-        <activity android:name=".PaymentActivity"></activity>
+        <activity android:name=".PaymentActivity" />
+        <activity
+            android:name=".PaymentActivity2"
+            android:label="@string/title_activity_main3"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
